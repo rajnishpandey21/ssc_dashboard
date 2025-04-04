@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Promotion Dashboard Viewer</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    select { font-size: 16px; padding: 5px 10px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background-color: #f4f4f4; }
+    a { color: blue; text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <h2>Promotion Dashboard Viewer</h2>
+  <label for="teacherSelect"><strong>Select Teacher:</strong></label>
+  <select id="teacherSelect">
+    <option value="">-- Choose --</option>
+  </select>
+
+  <table id="resultTable" style="display: none;">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Channel</th>
+        <th>Batch</th>
+        <th>Promo Link</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const teacherNames = [
+      "All Faculties", "Bhagyashree Bhartiya", "Bhragu Kulshrestha", "Deshraj Yadav", "Jay Shree", "Kapil Chahar",
+      "Krati Singh", "Kushal Anand", "Mayur Kasturi", "Namu Malik", "Nempal Solanki", "Neelam Sudama Girare",
+      "Nitin Sagar", "Pawan Dangi", "Prem Parmar", "Pramod Yadav", "Pulkit Sinha", "Ravinder Singh", "Riya Rathore",
+      "Sandeep Gupta", "Sandeep Kesarwani", "Sachin Modi", "Sharad", "Shilpi Mishra", "Shivam Dwivedi",
+      "SSC Wallah Team", "Sujawdin Khan", "Vikrant Tyagi", "Vivek Kumar Singh", "Vivek Rawat", "Vivek Tripathi"
+    ].sort();
+
+    // ✅ This is your published public CSV link
+    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRKzxvtQ4CZ8Nrv0L2Yh5M7o22IuycTW1S7QMwDwqS2B5JKiek-wBbwC8p3z64mse4FnWepWyHD9zai/pub?output=csv";
+
+    function loadTeachers() {
+      const select = document.getElementById("teacherSelect");
+      teacherNames.forEach(name => {
+        const option = document.createElement("option");
+        option.value = name;
+        option.textContent = name;
+        select.appendChild(option);
+      });
+    }
+
+    async function fetchSheetData() {
+      const res = await fetch(SHEET_CSV_URL);
+      const text = await res.text();
+
+      const lines = text.trim().split("\n");
+      const data = lines.map(line => {
+        const columns = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/); // handles commas inside quotes
+        return columns.map(cell => cell.replace(/^"|"$/g, "").trim());
+      });
+
+      return data.slice(3).filter(row => row[0]); // skip headers + blank rows
+    }
+
+    function displayResults(data, teacher) {
+      const table = document.getElementById("resultTable");
+      const tbody = table.querySelector("tbody");
+      tbody.innerHTML = "";
+
+      const filtered = data.filter(row => row[0] === teacher);
+
+      if (filtered.length > 0) {
+        table.style.display = "table";
+        filtered.forEach(row => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${row[1]}</td>
+            <td>${row[2]}</td>
+            <td>${row[3]}</td>
+            <td>${row[4]}</td>
+            <td><a href="${row[5]}" target="_blank">Link</a></td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } else {
+        table.style.display = "none";
+      }
+    }
+
+    async function init() {
+      loadTeachers();
+      const sheetData = await fetchSheetData();
+
+      document.getElementById("teacherSelect").addEventListener("change", function () {
+        const selected = this.value;
+        if (selected) {
+          displayResults(sheetData, selected);
+        } else {
+          document.getElementById("resultTable").style.display = "none";
+        }
+      });
+    }
+
+    init();
+  </script>
+
+</body>
+</html>
