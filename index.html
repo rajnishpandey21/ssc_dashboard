@@ -46,10 +46,21 @@
       margin-bottom: 20px;
     }
 
-    .table-container {
-      display: flex;
-      justify-content: center;
-    }
+.table-container {
+  display: flex;
+  justify-content: center;
+  overflow-x: auto;
+  max-height: 600px; /* allows scrolling within the table area */
+  margin-bottom: 30px;
+}
+
+#resultTable thead th {
+  position: sticky;
+  top: 0;
+  background-color: #f2f2f2;
+  z-index: 2;
+}
+
 
     #resultTable {
       margin: 40px auto 30px;
