@@ -23,6 +23,7 @@
   <table id="resultTable" style="display: none;">
     <thead>
       <tr>
+        <th>Teacher</th>
         <th>Date</th>
         <th>Time</th>
         <th>Channel</th>
@@ -42,7 +43,6 @@
       "SSC Wallah Team", "Sujawdin Khan", "Vikrant Tyagi", "Vivek Kumar Singh", "Vivek Rawat", "Vivek Tripathi"
     ].sort();
 
-    // ✅ This is your published public CSV link
     const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRKzxvtQ4CZ8Nrv0L2Yh5M7o22IuycTW1S7QMwDwqS2B5JKiek-wBbwC8p3z64mse4FnWepWyHD9zai/pub?output=csv";
 
     function loadTeachers() {
@@ -61,11 +61,11 @@
 
       const lines = text.trim().split("\n");
       const data = lines.map(line => {
-        const columns = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/); // handles commas inside quotes
+        const columns = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
         return columns.map(cell => cell.replace(/^"|"$/g, "").trim());
       });
 
-      return data.slice(3).filter(row => row[0]); // skip headers + blank rows
+      return data.slice(3).filter(row => row[0]); // Skip top 3 rows
     }
 
     function displayResults(data, teacher) {
@@ -80,6 +80,7 @@
         filtered.forEach(row => {
           const tr = document.createElement("tr");
           tr.innerHTML = `
+            <td>${row[0]}</td>
             <td>${row[1]}</td>
             <td>${row[2]}</td>
             <td>${row[3]}</td>
