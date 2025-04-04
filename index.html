@@ -50,7 +50,6 @@
   display: flex;
   justify-content: center;
   overflow-x: auto;
-  max-height: 600px; /*enables scroll inside the table area */
   margin-bottom: 30px;
 }
 
@@ -62,14 +61,18 @@
   background: #fff;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
   overflow: auto;
+  max-height: 500px; /* makes table scrollable if content is long */
 }
+
 
 #resultTable thead th {
   position: sticky;
   top: 0;
   background-color: #f2f2f2;
   z-index: 2;
+  box-shadow: 0 2px 3px rgba(0,0,0,0.1); /* subtle shadow under header */
 }
+
 
     #resultTable {
       margin: 40px auto 30px;
