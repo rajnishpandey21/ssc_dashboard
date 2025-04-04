@@ -17,7 +17,7 @@
   <h2>Promotion Dashboard Viewer</h2>
   <label for="teacherSelect"><strong>Select Teacher:</strong></label>
   <select id="teacherSelect">
-    <option value="">-- Choose --</option>
+    <option value="all">-- All Faculties --</option>
   </select>
 
   <table id="resultTable" style="display: none;">
@@ -36,11 +36,11 @@
 
   <script>
     const teacherNames = [
-      "All Faculties", "Bhagyashree Bhartiya", "Bhragu Kulshrestha", "Deshraj Yadav", "Jay Shree", "Kapil Chahar",
-      "Krati Singh", "Kushal Anand", "Mayur Kasturi", "Namu Malik", "Nempal Solanki", "Neelam Sudama Girare",
-      "Nitin Sagar", "Pawan Dangi", "Prem Parmar", "Pramod Yadav", "Pulkit Sinha", "Ravinder Singh", "Riya Rathore",
-      "Sandeep Gupta", "Sandeep Kesarwani", "Sachin Modi", "Sharad", "Shilpi Mishra", "Shivam Dwivedi",
-      "SSC Wallah Team", "Sujawdin Khan", "Vikrant Tyagi", "Vivek Kumar Singh", "Vivek Rawat", "Vivek Tripathi"
+      "Bhagyashree Bhartiya", "Bhragu Kulshrestha", "Kapil Chahar", "Nitin Sagar", "Namu Malik", "Pramod Yadav",
+      "Pulkit Sinha", "Ravinder Singh", "Riya Rathore", "Sandeep Gupta", "Sandeep Kesarwani", "Shilpi Mishra",
+      "Shivam Dwivedi", "SSC Wallah Team", "Vivek Tripathi", "Kushal Anand", "Krati Singh", "Mayur Kasturi",
+      "Sachin Modi", "Deshraj Yadav", "Nempal Solanki", "Pawan Dangi", "Sujawdin Khan", "Neelam Sudama Girare",
+      "Vivek Kumar Singh", "Sharad", "Prem Parmar", "Vikrant Tyagi", "Vivek Rawat", "Jay Shree"
     ].sort();
 
     const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRKzxvtQ4CZ8Nrv0L2Yh5M7o22IuycTW1S7QMwDwqS2B5JKiek-wBbwC8p3z64mse4FnWepWyHD9zai/pub?output=csv";
@@ -65,15 +65,17 @@
         return columns.map(cell => cell.replace(/^"|"$/g, "").trim());
       });
 
-      return data.slice(3).filter(row => row[0]); // Skip top 3 rows
+      return data.slice(3).filter(row => row[0]); // skip header + empty rows
     }
 
-    function displayResults(data, teacher) {
+    function displayResults(data, teacher = "all") {
       const table = document.getElementById("resultTable");
       const tbody = table.querySelector("tbody");
       tbody.innerHTML = "";
 
-      const filtered = data.filter(row => row[0] === teacher);
+      const filtered = (teacher === "all")
+        ? data
+        : data.filter(row => row[0] === teacher);
 
       if (filtered.length > 0) {
         table.style.display = "table";
@@ -98,13 +100,12 @@
       loadTeachers();
       const sheetData = await fetchSheetData();
 
+      // Show all data by default
+      displayResults(sheetData, "all");
+
       document.getElementById("teacherSelect").addEventListener("change", function () {
         const selected = this.value;
-        if (selected) {
-          displayResults(sheetData, selected);
-        } else {
-          document.getElementById("resultTable").style.display = "none";
-        }
+        displayResults(sheetData, selected);
       });
     }
 
