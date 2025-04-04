@@ -50,8 +50,18 @@
   display: flex;
   justify-content: center;
   overflow-x: auto;
-  max-height: 600px; /* allows scrolling within the table area */
+  /*max-height: 600px; enables scroll inside the table area */
   margin-bottom: 30px;
+}
+
+#resultTable {
+  width: 95%;
+  max-width: 1000px;
+  border: 1px solid #000;
+  border-radius: 15px;
+  background: #fff;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  overflow: auto;
 }
 
 #resultTable thead th {
@@ -60,7 +70,6 @@
   background-color: #f2f2f2;
   z-index: 2;
 }
-
 
     #resultTable {
       margin: 40px auto 30px;
