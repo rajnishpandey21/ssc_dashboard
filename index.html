@@ -227,7 +227,7 @@
             <td>${row[2]}</td>
             <td>${row[3]}</td>
             <td>${row[4]}</td>
-            <td><a href="${row[5]}" target="_blank">Link</a></td>
+            <td><a href="${row[5]}" target="_blank">${row[5]}</a></td>
           `;
           tbody.appendChild(tr);
         });
@@ -241,7 +241,11 @@
       const rows = Array.from(table.querySelectorAll("tr"));
       const csv = rows.map(row =>
         Array.from(row.querySelectorAll("th, td"))
-          .map(cell => `"${cell.innerText}"`)
+          .map(cell => {
+            const link = cell.querySelector("a");
+            const text = link ? link.href : cell.innerText;
+            return `"${text}"`;
+          })
           .join(",")
       ).join("\n");
 
