@@ -73,7 +73,7 @@
 
     #resultTable {
       width: 95%;
-      max-width: 1000px;
+      max-width: 1200px;
       border: 1px solid #000;
       border-radius: 15px;
       background: #fff;
@@ -110,20 +110,6 @@
       color: #0d47a1;
       font-weight: 500;
       text-decoration: underline;
-    }
-
-    /* Rounded corners */
-    #resultTable thead tr:first-child th:first-child {
-      border-top-left-radius: 15px;
-    }
-    #resultTable thead tr:first-child th:last-child {
-      border-top-right-radius: 15px;
-    }
-    #resultTable tbody tr:last-child td:first-child {
-      border-bottom-left-radius: 15px;
-    }
-    #resultTable tbody tr:last-child td:last-child {
-      border-bottom-right-radius: 15px;
     }
 
     footer {
@@ -177,6 +163,8 @@
           <th>Channel</th>
           <th>Batch</th>
           <th>Promo Link</th>
+          <th>DTP Name</th>
+          <th>Promo Status</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -191,11 +179,11 @@
   <!-- Script -->
   <script>
     const teacherNames = [
-      "Bhagyashree Bhartiya", "Bhragu Kulshrestha", "Kapil Chahar", "Nitin Sagar", "Namu Malik", "Pramod Yadav",
-      "Pulkit Sinha", "Ravinder Singh", "Riya Rathore", "Sandeep Gupta", "Sandeep Kesarwani", "Shilpi Mishra",
-      "Shivam Dwivedi", "SSC Wallah Team", "Vivek Tripathi", "Kushal Anand", "Krati Singh", "Mayur Kasturi",
-      "Sachin Modi", "Deshraj Yadav", "Nempal Solanki", "Pawan Dangi", "Sujawdin Khan", "Neelam Sudama Girare",
-      "Vivek Kumar Singh", "Sharad", "Prem Parmar", "Vikrant Tyagi", "Vivek Rawat", "Jay Shree"
+      "Akshay Mudgal", "Ankit Sirohi", "Arun Kumar", "Bhagyashrer Bhartiya", "Bhragu Kulshrestha",
+      "Himani Ma'am", "Jayshree Mukherjee", "Jitin", "Krati Singh", "Manoj Gautam",
+      "Nagesh Dubey", "Nempal Singh Solanki / Nitin Sir", "Nitin Sagar", "Pavan Singh Dangi",
+      "Pulkit Sinha", "Raghvendra Singh", "Raghuveer Singh Parmar", "Ravinder singh",
+      "Sandeep Gupta", "Shilpi Mishra", "Shubham Singh", "Vikrant Tyagi", "Vivek Tripathi"
     ].sort();
 
     const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRKzxvtQ4CZ8Nrv0L2Yh5M7o22IuycTW1S7QMwDwqS2B5JKiek-wBbwC8p3z64mse4FnWepWyHD9zai/pub?output=csv";
@@ -220,7 +208,7 @@
         return columns.map(cell => cell.replace(/^"|"$/g, "").trim());
       });
 
-      return data.slice(3).filter(row => row[0]);
+      return data.slice(3).filter(row => row[0]); // Skip headers + empty
     }
 
     function displayResults(data, teacher = "all") {
@@ -243,6 +231,8 @@
             <td>${row[3]}</td>
             <td>${row[4]}</td>
             <td><a href="${row[5]}" target="_blank">Link</a></td>
+            <td>${row[6]}</td>
+            <td>${row[7]}</td>
           `;
           tbody.appendChild(tr);
         });
