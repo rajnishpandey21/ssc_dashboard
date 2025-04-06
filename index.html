@@ -143,14 +143,21 @@
     <h1>Govt. Category Promotion Dashboard Viewer</h1>
   </header>
 
-  <!-- Controls -->
-  <div class="controls">
-    <label for="teacherSelect">Select Teacher:</label>
-    <select id="teacherSelect">
-      <option value="all">-- All Faculties --</option>
-    </select>
-    <button id="exportBtn">Export to CSV</button>
-  </div>
+<!-- Controls -->
+<div class="controls">
+  <label for="teacherSelect">Select Teacher:</label>
+  <select id="teacherSelect">
+    <option value="all">-- All Faculties --</option>
+  </select>
+
+  <label for="dtpSelect" style="margin-left: 20px;">Select DTP:</label>
+  <select id="dtpSelect">
+    <option value="all">-- All DTPs --</option>
+  </select>
+
+  <button id="exportBtn">Export to CSV</button>
+</div>
+
 
   <!-- Table -->
   <div class="table-container">
@@ -176,109 +183,134 @@
     Made with ❤️ for sake of karma
   </footer>
 
-  <!-- Script -->
-  <script>
-    const teacherNames = [
-      "Akshay Mudgal", "Ankit Sirohi", "Arun Kumar", "Bhagyashrer Bhartiya", "Bhragu Kulshrestha",
-      "Himani Ma'am", "Jayshree Mukherjee", "Jitin", "Krati Singh", "Manoj Gautam",
-      "Nagesh Dubey", "Nempal Singh Solanki / Nitin Sir", "Nitin Sagar", "Pavan Singh Dangi",
-      "Pulkit Sinha", "Raghvendra Singh", "Raghuveer Singh Parmar", "Ravinder singh",
-      "Sandeep Gupta", "Shilpi Mishra", "Shubham Singh", "Vikrant Tyagi", "Vivek Tripathi"
-    ].sort();
+ <script>
+  const teacherNames = [
+    "Akshay Mudgal", "Ankit Sirohi", "Arun Kumar", "Bhagyashrer Bhartiya", "Bhragu Kulshrestha",
+    "Himani Ma'am", "Jayshree Mukherjee", "Jitin", "Krati Singh", "Manoj Gautam",
+    "Nagesh Dubey", "Nempal Singh Solanki / Nitin Sir", "Nitin Sagar", "Pavan Singh Dangi",
+    "Pulkit Sinha", "Raghvendra Singh", "Raghuveer Singh Parmar", "Ravinder singh",
+    "Sandeep Gupta", "Shilpi Mishra", "Shubham Singh", "Vikrant Tyagi", "Vivek Tripathi"
+  ].sort();
 
-    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRKzxvtQ4CZ8Nrv0L2Yh5M7o22IuycTW1S7QMwDwqS2B5JKiek-wBbwC8p3z64mse4FnWepWyHD9zai/pub?output=csv";
+  const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRKzxvtQ4CZ8Nrv0L2Yh5M7o22IuycTW1S7QMwDwqS2B5JKiek-wBbwC8p3z64mse4FnWepWyHD9zai/pub?output=csv";
 
-    function loadTeachers() {
-      const select = document.getElementById("teacherSelect");
-      teacherNames.forEach(name => {
-        const option = document.createElement("option");
-        option.value = name;
-        option.textContent = name;
-        select.appendChild(option);
+  function loadTeachers() {
+    const select = document.getElementById("teacherSelect");
+    teacherNames.forEach(name => {
+      const option = document.createElement("option");
+      option.value = name;
+      option.textContent = name;
+      select.appendChild(option);
+    });
+  }
+
+  function loadDTPs(data) {
+    const dtpSet = new Set();
+    data.forEach(row => {
+      if (row[6]) dtpSet.add(row[6]); // Column G
+    });
+
+    const dtpSelect = document.getElementById("dtpSelect");
+    dtpSet.forEach(dtp => {
+      const option = document.createElement("option");
+      option.value = dtp;
+      option.textContent = dtp;
+      dtpSelect.appendChild(option);
+    });
+  }
+
+  async function fetchSheetData() {
+    const res = await fetch(SHEET_CSV_URL);
+    const text = await res.text();
+
+    const lines = text.trim().split("\n");
+    const data = lines.map(line => {
+      const columns = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+      return columns.map(cell => cell.replace(/^"|"$/g, "").trim());
+    });
+
+    return data.slice(3).filter(row => row[0]);
+  }
+
+  function displayResults(data) {
+    const selectedTeacher = document.getElementById("teacherSelect").value;
+    const selectedDTP = document.getElementById("dtpSelect").value;
+
+    const table = document.getElementById("resultTable");
+    const tbody = table.querySelector("tbody");
+    tbody.innerHTML = "";
+
+    const filtered = data.filter(row => {
+      const teacherMatch = selectedTeacher === "all" || row[0] === selectedTeacher;
+      const dtpMatch = selectedDTP === "all" || row[6] === selectedDTP;
+      return teacherMatch && dtpMatch;
+    });
+
+    if (filtered.length > 0) {
+      table.style.display = "table";
+      filtered.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${row[0]}</td>
+          <td>${row[1]}</td>
+          <td>${row[2]}</td>
+          <td>${row[3]}</td>
+          <td>${row[4]}</td>
+          <td><a href="${row[5]}" target="_blank">Link</a></td>
+          <td>${row[6]}</td>
+          <td>${row[7]}</td>
+        `;
+        tbody.appendChild(tr);
       });
+    } else {
+      table.style.display = "none";
     }
+  }
 
-    async function fetchSheetData() {
-      const res = await fetch(SHEET_CSV_URL);
-      const text = await res.text();
+  function exportTableToCSV(filename = "promotion_data.csv") {
+    const table = document.getElementById("resultTable");
+    const rows = Array.from(table.querySelectorAll("tr"));
+    const csv = rows.map(row =>
+      Array.from(row.querySelectorAll("th, td"))
+        .map(cell => {
+          const link = cell.querySelector("a");
+          const text = link ? link.href : cell.innerText;
+          return `"${text}"`;
+        })
+        .join(",")
+    ).join("\n");
 
-      const lines = text.trim().split("\n");
-      const data = lines.map(line => {
-        const columns = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-        return columns.map(cell => cell.replace(/^"|"$/g, "").trim());
-      });
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
 
-      return data.slice(3).filter(row => row[0]); // Skip headers + empty
-    }
+  async function init() {
+    loadTeachers();
 
-    function displayResults(data, teacher = "all") {
-      const table = document.getElementById("resultTable");
-      const tbody = table.querySelector("tbody");
-      tbody.innerHTML = "";
+    const sheetData = await fetchSheetData();
+    loadDTPs(sheetData);
+    displayResults(sheetData);
 
-      const filtered = (teacher === "all")
-        ? data
-        : data.filter(row => row[0] === teacher);
+    document.getElementById("teacherSelect").addEventListener("change", () => {
+      displayResults(sheetData);
+    });
 
-      if (filtered.length > 0) {
-        table.style.display = "table";
-        filtered.forEach(row => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${row[0]}</td>
-            <td>${row[1]}</td>
-            <td>${row[2]}</td>
-            <td>${row[3]}</td>
-            <td>${row[4]}</td>
-            <td><a href="${row[5]}" target="_blank">Link</a></td>
-            <td>${row[6]}</td>
-            <td>${row[7]}</td>
-          `;
-          tbody.appendChild(tr);
-        });
-      } else {
-        table.style.display = "none";
-      }
-    }
+    document.getElementById("dtpSelect").addEventListener("change", () => {
+      displayResults(sheetData);
+    });
 
-    function exportTableToCSV(filename = "promotion_data.csv") {
-      const table = document.getElementById("resultTable");
-      const rows = Array.from(table.querySelectorAll("tr"));
-      const csv = rows.map(row =>
-        Array.from(row.querySelectorAll("th, td"))
-          .map(cell => {
-            const link = cell.querySelector("a");
-            const text = link ? link.href : cell.innerText;
-            return `"${text}"`;
-          })
-          .join(",")
-      ).join("\n");
+    document.getElementById("exportBtn").addEventListener("click", () => {
+      exportTableToCSV();
+    });
+  }
 
-      const blob = new Blob([csv], { type: "text/csv" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      a.click();
-      URL.revokeObjectURL(url);
-    }
+  init();
+</script>
 
-    async function init() {
-      loadTeachers();
-      const sheetData = await fetchSheetData();
-      displayResults(sheetData, "all");
-
-      document.getElementById("teacherSelect").addEventListener("change", function () {
-        const selected = this.value;
-        displayResults(sheetData, selected);
-      });
-
-      document.getElementById("exportBtn").addEventListener("click", () => {
-        exportTableToCSV();
-      });
-    }
-
-    init();
-  </script>
 </body>
 </html>
