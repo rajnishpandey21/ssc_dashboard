@@ -5,16 +5,29 @@
   <title>Govt. Category Promotion Dashboard Viewer</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 <style>
-  body {
-    font-family: 'Poppins', sans-serif;
-    margin: 0;
-    padding: 40px 20px 20px;
-    color: #333;
-    min-height: 100vh;
-    position: relative;
-    overflow-x: hidden;
-    background: #fefefe;
-  }
+body {
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 40px 20px 20px;
+  color: #333;
+  min-height: 100vh;
+  background-image: url('https://img.freepik.com/free-vector/gradient-abstract-wireframe-background_23-2149009903.jpg?t=st=1743956748~exp=1743960348~hmac=aad1d672654330892389ef0d66d7940bb51ed0e9500117bd626404b4fc50910c&w=1380');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  <div class="overlay"></div>
+
+}
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.85); /* Adjust opacity as needed */
+  z-index: -1;
+}
 
   /* Floating Circles Animated Background */
   .animated-bg {
