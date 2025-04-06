@@ -155,7 +155,15 @@
     <option value="all">-- All DTPs --</option>
   </select>
 
-  <button id="exportBtn">Export to CSV</button>
+  <label for="startDate" style="margin-left: 20px;">Start Date:</label>
+  <input type="date" id="startDate">
+
+  <label for="endDate" style="margin-left: 10px;">End Date:</label>
+  <input type="date" id="endDate">
+
+<button id="exportBtn">Export to CSV</button>
+<button id="clearFiltersBtn" style="margin-left: 10px; background-color: #c62828;">Clear Filters</button>
+
 </div>
 
 
@@ -183,7 +191,7 @@
     Made with ❤️ for sake of karma
   </footer>
 
- <script>
+<script>
   const teacherNames = [
     "Akshay Mudgal", "Ankit Sirohi", "Arun Kumar", "Bhagyashrer Bhartiya", "Bhragu Kulshrestha",
     "Himani Ma'am", "Jayshree Mukherjee", "Jitin", "Krati Singh", "Manoj Gautam",
@@ -235,6 +243,8 @@
   function displayResults(data) {
     const selectedTeacher = document.getElementById("teacherSelect").value;
     const selectedDTP = document.getElementById("dtpSelect").value;
+    const startDate = document.getElementById("startDate").value;
+    const endDate = document.getElementById("endDate").value;
 
     const table = document.getElementById("resultTable");
     const tbody = table.querySelector("tbody");
@@ -243,7 +253,13 @@
     const filtered = data.filter(row => {
       const teacherMatch = selectedTeacher === "all" || row[0] === selectedTeacher;
       const dtpMatch = selectedDTP === "all" || row[6] === selectedDTP;
-      return teacherMatch && dtpMatch;
+
+      const rowDate = new Date(row[1]); // Column B
+      const isInRange =
+        (!startDate || rowDate >= new Date(startDate)) &&
+        (!endDate || rowDate <= new Date(endDate));
+
+      return teacherMatch && dtpMatch && isInRange;
     });
 
     if (filtered.length > 0) {
@@ -304,10 +320,26 @@
       displayResults(sheetData);
     });
 
+    document.getElementById("startDate").addEventListener("change", () => {
+      displayResults(sheetData);
+    });
+
+    document.getElementById("endDate").addEventListener("change", () => {
+      displayResults(sheetData);
+    });
+
     document.getElementById("exportBtn").addEventListener("click", () => {
       exportTableToCSV();
     });
   }
+document.getElementById("clearFiltersBtn").addEventListener("click", () => {
+  document.getElementById("teacherSelect").value = "all";
+  document.getElementById("dtpSelect").value = "all";
+  document.getElementById("startDate").value = "";
+  document.getElementById("endDate").value = "";
+
+  displayResults(sheetData);
+});
 
   init();
 </script>
