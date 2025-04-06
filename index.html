@@ -201,6 +201,7 @@
   ].sort();
 
   const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRKzxvtQ4CZ8Nrv0L2Yh5M7o22IuycTW1S7QMwDwqS2B5JKiek-wBbwC8p3z64mse4FnWepWyHD9zai/pub?output=csv";
+  let sheetData = []; // ✅ Global to make it accessible everywhere
 
   function loadTeachers() {
     const select = document.getElementById("teacherSelect");
@@ -307,8 +308,7 @@
 
   async function init() {
     loadTeachers();
-
-    const sheetData = await fetchSheetData();
+    sheetData = await fetchSheetData();
     loadDTPs(sheetData);
     displayResults(sheetData);
 
@@ -331,18 +331,20 @@
     document.getElementById("exportBtn").addEventListener("click", () => {
       exportTableToCSV();
     });
-  }
-document.getElementById("clearFiltersBtn").addEventListener("click", () => {
-  document.getElementById("teacherSelect").value = "all";
-  document.getElementById("dtpSelect").value = "all";
-  document.getElementById("startDate").value = "";
-  document.getElementById("endDate").value = "";
 
-  displayResults(sheetData);
-});
+    document.getElementById("clearFiltersBtn").addEventListener("click", () => {
+      document.getElementById("teacherSelect").value = "all";
+      document.getElementById("dtpSelect").value = "all";
+      document.getElementById("startDate").value = "";
+      document.getElementById("endDate").value = "";
+
+      displayResults(sheetData);
+    });
+  }
 
   init();
 </script>
+
 
 </body>
 </html>
